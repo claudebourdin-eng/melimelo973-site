@@ -1,0 +1,17 @@
+baseURL = "https://melimelo973.netlify.app"
+languageCode = "fr-FR"
+defaultContentLanguage = "fr"
+title = "Méli-Mélo 973"
+theme = "poemes-theme"
+paginate = 20
+
+[params]
+  author      = "Méli-Mélo 973"
+  subtitle    = "✨ Méli-Mélo 973"
+  description = "Un jardin de mots, de rimes et d'émotions."
+
+[taxonomies]
+  tag = "tags"
+
+[markup.goldmark.renderer]
+  unsafe = true

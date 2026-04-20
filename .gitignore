@@ -1,0 +1,7 @@
+hugo-site/public/
+hugo-site/resources/
+.hugo_build.lock
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

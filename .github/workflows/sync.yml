@@ -1,0 +1,79 @@
+name: Sync Blogger → Netlify
+
+on:
+  # ① Se déclenche automatiquement chaque nuit à minuit (heure de Paris)
+  schedule:
+    - cron: "0 23 * * *"   # 23h UTC = minuit heure de la Martinique (UTC-4 en été)
+
+  # ② Peut aussi être lancé manuellement depuis GitHub
+  workflow_dispatch:
+    inputs:
+      force_reimport:
+        description: "Réimporter TOUS les articles (pas seulement les nouveaux) ?"
+        required: false
+        default: "false"
+
+jobs:
+  sync-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Récupère le code du dépôt
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      # 2. Installe Python
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 3. Installe les dépendances Python
+      - name: 📦 Install Python deps
+        run: pip install requests html2text
+
+      # 4. Réinitialise l'état si force_reimport est demandé
+      - name: 🔄 Reset import state (si demandé)
+        if: github.event.inputs.force_reimport == 'true'
+        run: rm -f scripts/imported_ids.json
+
+      # 5. Importe les nouveaux poèmes depuis Blogger
+      - name: 🌺 Import poems from Blogger
+        env:
+          BLOGGER_API_KEY: ${{ secrets.BLOGGER_API_KEY }}
+        run: |
+          # Injecter la clé API dans le script
+          sed -i "s|AIzaSyAlZcoFvzlr7KaMzyfL4L6vYEvMj2QQLyE|$BLOGGER_API_KEY|g" scripts/import_blogger.py
+          python3 scripts/import_blogger.py
+
+      # 6. Installe Hugo
+      - name: 🏗️ Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "0.128.0"
+          extended: true
+
+      # 7. Construit le site
+      - name: 🔨 Build Hugo site
+        run: hugo --minify
+        working-directory: hugo-site
+
+      # 8. Déploie sur Netlify
+      - name: 🚀 Deploy to Netlify
+        uses: nwtgck/actions-netlify@v3
+        with:
+          publish-dir: "hugo-site/public"
+          production-branch: main
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Auto-sync Blogger ${{ github.run_number }}"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID:    ${{ secrets.NETLIFY_SITE_ID }}
+
+      # 9. Sauvegarde l'état des articles importés (pour la prochaine fois)
+      - name: 💾 Save import state
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update imported_ids.json"
+          file_pattern: "scripts/imported_ids.json"

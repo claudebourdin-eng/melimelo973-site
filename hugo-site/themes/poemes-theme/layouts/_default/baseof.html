@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} — {{ .Site.Title }}{{ end }}</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="site-title">{{ .Site.Title }}</a>
+            <div class="nav-links">
+                <a href="/">Accueil</a>
+                <a href="/poemes/">Tous les poèmes</a>
+                <a href="/tags/">Par thème</a>
+            </div>
+        </nav>
+    </header>
+    <main>{{ block "main" . }}{{ end }}</main>
+    <footer>
+        <p>© {{ now.Year }} {{ .Site.Params.author }} — Tous droits réservés</p>
+    </footer>
+</body>
+</html>
