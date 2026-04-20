@@ -1,4 +1,4 @@
-﻿name: Sync Blogger vers Netlify
+﻿name: Sync Blogger vers GitHub Pages
 
 on:
   schedule:
@@ -9,6 +9,11 @@ on:
         description: "Reimporter tous les articles ?"
         required: false
         default: "false"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   sync-and-deploy:
@@ -46,17 +51,11 @@ jobs:
         run: hugo --minify
         working-directory: hugo-site
 
-      - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v3
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          publish-dir: "hugo-site/public"
-          production-branch: main
-          production-deploy: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Auto-sync Blogger ${{ github.run_number }}"
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./hugo-site/public
 
       - name: Save import state
         uses: stefanzweifel/git-auto-commit-action@v5
