@@ -1,65 +1,52 @@
-﻿name: Sync Blogger â†’ Netlify
+﻿name: Sync Blogger vers Netlify
 
 on:
-  # â‘  Se dÃ©clenche automatiquement chaque nuit Ã  minuit (heure de Paris)
   schedule:
-    - cron: "0 23 * * *"   # 23h UTC = minuit heure de la Martinique (UTC-4 en Ã©tÃ©)
-
-  # â‘¡ Peut aussi Ãªtre lancÃ© manuellement depuis GitHub
+    - cron: "0 23 * * *"
   workflow_dispatch:
     inputs:
       force_reimport:
-        description: "RÃ©importer TOUS les articles (pas seulement les nouveaux) ?"
+        description: "Reimporter tous les articles ?"
         required: false
         default: "false"
 
 jobs:
   sync-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. RÃ©cupÃ¨re le code du dÃ©pÃ´t
-      - name: ðŸ“¥ Checkout
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. Installe Python
-      - name: ðŸ Setup Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # 3. Installe les dÃ©pendances Python
-      - name: ðŸ“¦ Install Python deps
+      - name: Install Python deps
         run: pip install requests html2text
 
-      # 4. RÃ©initialise l'Ã©tat si force_reimport est demandÃ©
-      - name: ðŸ”„ Reset import state (si demandÃ©)
+      - name: Reset import state
         if: github.event.inputs.force_reimport == 'true'
         run: rm -f scripts/imported_ids.json
 
-      # 5. Importe les nouveaux poÃ¨mes depuis Blogger
-      - name: ðŸŒº Import poems from Blogger
+      - name: Import poems from Blogger
         env:
           BLOGGER_API_KEY: ${{ secrets.BLOGGER_API_KEY }}
         run: |
-          # Injecter la clÃ© API dans le script
           sed -i "s|AIzaSyAlZcoFvzlr7KaMzyfL4L6vYEvMj2QQLyE|$BLOGGER_API_KEY|g" scripts/import_blogger.py
           python3 scripts/import_blogger.py
 
-      # 6. Installe Hugo
-      - name: ðŸ—ï¸ Setup Hugo
+      - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: "0.128.0"
           extended: true
 
-      # 7. Construit le site
-      - name: ðŸ”¨ Build Hugo site
+      - name: Build Hugo site
         run: hugo --minify
         working-directory: hugo-site
 
-      # 8. DÃ©ploie sur Netlify
-      - name: ðŸš€ Deploy to Netlify
+      - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3
         with:
           publish-dir: "hugo-site/public"
@@ -69,12 +56,10 @@ jobs:
           deploy-message: "Auto-sync Blogger ${{ github.run_number }}"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID:    ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
-      # 9. Sauvegarde l'Ã©tat des articles importÃ©s (pour la prochaine fois)
-      - name: ðŸ’¾ Save import state
+      - name: Save import state
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: update imported_ids.json"
           file_pattern: "scripts/imported_ids.json hugo-site/content/poemes/*.md"
-
