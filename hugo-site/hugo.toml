@@ -1,14 +1,20 @@
 baseURL = "https://claudebourdin-eng.github.io/melimelo973-site/"
 languageCode = "fr-FR"
 defaultContentLanguage = "fr"
+defaultContentLanguageInSubdir = false
 title = "Meli-Melo 973"
 theme = "poemes-theme"
 paginate = 20
 
+[languages]
+  [languages.fr]
+    languageName = "Francais"
+    weight = 1
+
 [params]
-  author      = "Meli-Melo 973"
-  subtitle    = "Meli-Melo 973"
-  description = "Un jardin de mots, de rimes et d'emotions."
+  author = "Meli-Melo 973"
+  subtitle = "Meli-Melo 973"
+  description = "Un jardin de mots, de rimes et d emotions."
 
 [taxonomies]
   tag = "tags"
