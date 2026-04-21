@@ -48,6 +48,12 @@ def get_all_posts(blog_id):
     print(f"OK {len(posts)} articles trouves au total")
     return posts
 
+def normalize_title(title):
+    title = unescape(title)
+    title = title.lower().strip()
+    title = re.sub(r'\s+', ' ', title)
+    return title
+
 def slugify(text):
     text = unescape(text).lower()
     for src, dst in [('aàáâãäå','a'),('eèéêë','e'),('iìíîï','i'),('oòóôõö','o'),('uùúûü','u'),('ç','c'),('ñ','n')]:
@@ -79,7 +85,7 @@ def post_to_markdown(post):
     tags_yml = "\n".join(f'  - "{l}"' for l in labels) or "  []"
     content  = html_to_markdown(post.get("content", ""))
     front = f"""---
-title: "{title.replace('"', "'")}"
+title: "{title.replace(chr(34), chr(39))}"
 date: {date_str}
 slug: "{slug}"
 tags:
@@ -116,9 +122,9 @@ def main():
     new_posts = []
     for p in posts:
         if p["id"] not in imported_ids:
-            title = p.get("title", "")
-            if title not in seen_titles:
-                seen_titles.add(title)
+            norm_title = normalize_title(p.get("title", ""))
+            if norm_title not in seen_titles:
+                seen_titles.add(norm_title)
                 new_posts.append(p)
     print(f"\nNouveaux articles a importer : {len(new_posts)}")
     if not new_posts:
