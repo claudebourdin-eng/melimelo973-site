@@ -1,15 +1,9 @@
-baseURL = "https://claudebourdin-eng.github.io/melimelo973-site/"
+baseURL = "https://claudebourdin-eng.github.io/"
 languageCode = "fr-FR"
 defaultContentLanguage = "fr"
-defaultContentLanguageInSubdir = false
 title = "Meli-Melo 973"
 theme = "poemes-theme"
 paginate = 20
-
-[languages]
-  [languages.fr]
-    languageName = "Francais"
-    weight = 1
 
 [params]
   author = "Meli-Melo 973"
