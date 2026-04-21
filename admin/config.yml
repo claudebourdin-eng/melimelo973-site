@@ -1,0 +1,34 @@
+﻿backend:
+  name: git-gateway
+  branch: main
+
+media_folder: hugo-site/static/images
+public_folder: /images
+locale: fr
+
+collections:
+  - name: poemes
+    label: Poemes
+    folder: hugo-site/content/poemes
+    create: true
+    slug: '{{year}}-{{month}}-{{day}}-{{slug}}'
+    editor:
+      preview: false
+    fields:
+      - label: Titre
+        name: title
+        widget: string
+      - label: Date
+        name: date
+        widget: datetime
+      - label: Themes
+        name: tags
+        widget: list
+        required: false
+      - label: Brouillon
+        name: draft
+        widget: boolean
+        default: false
+      - label: Contenu
+        name: body
+        widget: markdown
