@@ -1,14 +1,14 @@
-baseURL = "https://melimelo973.netlify.app"
+﻿baseURL = "https://claudebourdin-eng.github.io/melimelo973-site/"
 languageCode = "fr-FR"
 defaultContentLanguage = "fr"
-title = "Méli-Mélo 973"
+title = "MÃ©li-MÃ©lo 973"
 theme = "poemes-theme"
 paginate = 20
 
 [params]
-  author      = "Méli-Mélo 973"
-  subtitle    = "✨ Méli-Mélo 973"
-  description = "Un jardin de mots, de rimes et d'émotions."
+  author      = "MÃ©li-MÃ©lo 973"
+  subtitle    = "âœ¨ MÃ©li-MÃ©lo 973"
+  description = "Un jardin de mots, de rimes et d'Ã©motions."
 
 [taxonomies]
   tag = "tags"
