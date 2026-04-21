@@ -4,9 +4,9 @@
     <p class="hero-desc">{{ .Site.Params.description }}</p>
 </div>
 <section class="recent-poems">
-    <h2>Derniers poemes</h2>
+    <h2>Derniers poèmes</h2>
     <div class="poem-grid">
-        {{ range first 9 (where .Site.RegularPages "Section" "poemes") }}
+        {{ range first 9 (where .Site.RegularPages "Section" "poèmes") }}
         <article class="poem-card">
             <a href="{{ .RelPermalink }}">
                 <h3>{{ .Title }}</h3>
@@ -16,6 +16,6 @@
         </article>
         {{ end }}
     </div>
-    <a href="/poemes/" class="btn-all">Voir tous les poemes</a>
+    <a href="/poemes/" class="btn-all">Voir tous les poèmes</a>
 </section>
 {{ end }}
