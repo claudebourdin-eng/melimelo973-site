@@ -48,14 +48,20 @@ def get_all_posts(blog_id):
     print(f"OK {len(posts)} articles trouves au total")
     return posts
 
-def normalize_title(title):
+def clean_title(title):
     title = unescape(title)
-    title = title.lower().strip()
+    title = title.replace("'", "'").replace('"', '"').replace('"', '"')
+    title = title.strip("'\" ")
+    return title
+
+def normalize_title(title):
+    title = clean_title(title).lower().strip()
+    title = re.sub(r"['\"\u2018\u2019\u201c\u201d]", "", title)
     title = re.sub(r'\s+', ' ', title)
     return title
 
 def slugify(text):
-    text = unescape(text).lower()
+    text = clean_title(text).lower()
     for src, dst in [('aàáâãäå','a'),('eèéêë','e'),('iìíîï','i'),('oòóôõö','o'),('uùúûü','u'),('ç','c'),('ñ','n')]:
         for c in src:
             text = text.replace(c, dst)
@@ -71,7 +77,7 @@ def html_to_markdown(html):
     return re.sub(r'\n{3,}', '\n\n', md).strip()
 
 def post_to_markdown(post):
-    title = unescape(post.get("title", "Sans titre"))
+    title = clean_title(post.get("title", "Sans titre"))
     slug  = slugify(title)
     published = post.get("published", "")
     try:
@@ -84,8 +90,9 @@ def post_to_markdown(post):
     labels   = post.get("labels", [])
     tags_yml = "\n".join(f'  - "{l}"' for l in labels) or "  []"
     content  = html_to_markdown(post.get("content", ""))
+    safe_title = title.replace('"', "'")
     front = f"""---
-title: "{title.replace(chr(34), chr(39))}"
+title: "{safe_title}"
 date: {date_str}
 slug: "{slug}"
 tags:
@@ -122,9 +129,9 @@ def main():
     new_posts = []
     for p in posts:
         if p["id"] not in imported_ids:
-            norm_title = normalize_title(p.get("title", ""))
-            if norm_title not in seen_titles:
-                seen_titles.add(norm_title)
+            norm = normalize_title(p.get("title", ""))
+            if norm not in seen_titles:
+                seen_titles.add(norm)
                 new_posts.append(p)
     print(f"\nNouveaux articles a importer : {len(new_posts)}")
     if not new_posts:
