@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} — {{ .Site.Title }}{{ end }}</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} â€” {{ .Site.Title }}{{ end }}</title>
+    <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
 </head>
 <body>
     <header>
@@ -12,14 +12,15 @@
             <a href="/" class="site-title">{{ .Site.Title }}</a>
             <div class="nav-links">
                 <a href="/">Accueil</a>
-                <a href="/poemes/">Tous les poèmes</a>
-                <a href="/tags/">Par thème</a>
+                <a href="/poemes/">Tous les poÃ¨mes</a>
+                <a href="/tags/">Par thÃ¨me</a>
             </div>
         </nav>
     </header>
     <main>{{ block "main" . }}{{ end }}</main>
     <footer>
-        <p>© {{ now.Year }} {{ .Site.Params.author }} — Tous droits réservés</p>
+        <p>Â© {{ now.Year }} {{ .Site.Params.author }} â€” Tous droits rÃ©servÃ©s</p>
     </footer>
 </body>
 </html>
+
