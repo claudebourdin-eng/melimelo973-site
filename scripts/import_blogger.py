@@ -1,12 +1,4 @@
-﻿#!/usr/bin/env python3
-"""
-import_blogger.py
-RÃ©cupÃ¨re tous les poÃ¨mes de melimelo973.blogspot.com
-et gÃ©nÃ¨re les fichiers Markdown pour Hugo.
-DÃ©tecte automatiquement les nouveaux articles pour n'importer que les nouveautÃ©s.
-"""
-
-import requests
+﻿import requests
 import os
 import re
 import json
@@ -14,12 +6,10 @@ from datetime import datetime
 from html import unescape
 import html2text
 
-# â”€â”€â”€ CONFIGURATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 API_KEY    = "AIzaSyAlZcoFvzlr7KaMzyfL4L6vYEvMj2QQLyE"
 BLOG_URL   = "https://melimelo973.blogspot.com"
 OUTPUT_DIR = "hugo-site/content/poemes"
-STATE_FILE = "scripts/imported_ids.json"   # MÃ©morise les articles dÃ©jÃ  importÃ©s
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+STATE_FILE = "scripts/imported_ids.json"
 
 def load_imported_ids():
     if os.path.exists(STATE_FILE):
@@ -37,7 +27,7 @@ def get_blog_id():
     r = requests.get(url, params={"url": BLOG_URL, "key": API_KEY})
     r.raise_for_status()
     data = r.json()
-    print(f"âœ… Blog : {data['name']} (ID: {data['id']})")
+    print(f"OK Blog : {data['name']} (ID: {data['id']})")
     return data["id"]
 
 def get_all_posts(blog_id):
@@ -45,7 +35,7 @@ def get_all_posts(blog_id):
     url = f"https://www.googleapis.com/blogger/v3/blogs/{blog_id}/posts"
     params = {"key": API_KEY, "maxResults": 500, "status": "live"}
     while True:
-        print(f"  â†’ Page {page}...")
+        print(f"  -> Page {page}...")
         r = requests.get(url, params=params)
         r.raise_for_status()
         data = r.json()
@@ -55,12 +45,12 @@ def get_all_posts(blog_id):
             break
         params["pageToken"] = token
         page += 1
-    print(f"âœ… {len(posts)} articles trouvÃ©s au total")
+    print(f"OK {len(posts)} articles trouves au total")
     return posts
 
 def slugify(text):
     text = unescape(text).lower()
-    for src, dst in [('Ã Ã¡Ã¢Ã£Ã¤Ã¥','a'),('Ã¨Ã©ÃªÃ«','e'),('Ã¬Ã­Ã®Ã¯','i'),('Ã²Ã³Ã´ÃµÃ¶','o'),('Ã¹ÃºÃ»Ã¼','u'),('Ã§','c'),('Ã±','n')]:
+    for src, dst in [('aàáâãäå','a'),('eèéêë','e'),('iìíîï','i'),('oòóôõö','o'),('uùúûü','u'),('ç','c'),('ñ','n')]:
         for c in src:
             text = text.replace(c, dst)
     text = re.sub(r'[^a-z0-9\s-]', '', text)
@@ -85,11 +75,9 @@ def post_to_markdown(post):
     except:
         date_str = published
         date_pfx = published[:10] if published else "0000-00-00"
-
     labels   = post.get("labels", [])
     tags_yml = "\n".join(f'  - "{l}"' for l in labels) or "  []"
     content  = html_to_markdown(post.get("content", ""))
-
     front = f"""---
 title: "{title.replace('"', "'")}"
 date: {date_str}
@@ -118,49 +106,41 @@ def save_post(slug, date_pfx, content):
 
 def main():
     print("=" * 55)
-    print("  Migration / Synchronisation Blogger â†’ Hugo")
+    print("  Synchronisation Blogger -> Hugo")
     print("=" * 55)
-
     imported_ids = load_imported_ids()
-    print(f"\nðŸ“‹ Articles dÃ©jÃ  importÃ©s : {len(imported_ids)}")
-
+    print(f"\nArticles deja importes : {len(imported_ids)}")
     blog_id = get_blog_id()
     posts   = get_all_posts(blog_id)
-
     seen_titles = set()
-new_posts = []
-for p in posts:
-    if p["id"] not in imported_ids:
-        title = p.get("title", "")
-        if title not in seen_titles:
-            seen_titles.add(title)
-            new_posts.append(p)
-    print(f"\nðŸ†• Nouveaux articles Ã  importer : {len(new_posts)}")
-
+    new_posts = []
+    for p in posts:
+        if p["id"] not in imported_ids:
+            title = p.get("title", "")
+            if title not in seen_titles:
+                seen_titles.add(title)
+                new_posts.append(p)
+    print(f"\nNouveaux articles a importer : {len(new_posts)}")
     if not new_posts:
-        print("\nâœ… Rien de nouveau. Le site est dÃ©jÃ  Ã  jour !")
+        print("\nOK Rien de nouveau. Le site est deja a jour !")
         return
-
     saved, errors = 0, 0
     for post in new_posts:
         try:
             slug, date_pfx, content = post_to_markdown(post)
             name = save_post(slug, date_pfx, content)
             imported_ids.add(post["id"])
-            print(f"  âœ… {name}")
+            print(f"  OK {name}")
             saved += 1
         except Exception as e:
-            print(f"  âŒ '{post.get('title','?')}' : {e}")
+            print(f"  ERREUR '{post.get('title','?')}' : {e}")
             errors += 1
-
     save_imported_ids(imported_ids)
-
     print(f"\n{'=' * 55}")
-    print(f"  âœ… {saved} nouveaux poÃ¨mes importÃ©s")
+    print(f"  OK {saved} nouveaux poemes importes")
     if errors:
-        print(f"  âš ï¸  {errors} erreurs")
+        print(f"  ERREURS : {errors}")
     print(f"{'=' * 55}")
 
 if __name__ == "__main__":
     main()
-
