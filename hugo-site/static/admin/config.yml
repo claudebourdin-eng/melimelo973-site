@@ -1,19 +1,18 @@
 ﻿backend:
-  name: git-gateway
+  name: github
+  repo: claudebourdin-eng/claudebourdin-eng.github.io
   branch: main
+  base_url: https://sveltia-cms-auth.pages.dev
 
 media_folder: hugo-site/static/images
 public_folder: /images
-locale: fr
 
 collections:
   - name: poemes
     label: Poemes
     folder: hugo-site/content/poemes
     create: true
-    slug: '{{year}}-{{month}}-{{day}}-{{slug}}'
-    editor:
-      preview: false
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
       - label: Titre
         name: title
