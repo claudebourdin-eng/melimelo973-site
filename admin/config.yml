@@ -2,7 +2,7 @@
   name: github
   repo: claudebourdin-eng/claudebourdin-eng.github.io
   branch: main
-  base_url: https://sveltia-cms-auth.pages.dev
+  base_url: https://cms-auth.netlify.app
 
 media_folder: hugo-site/static/images
 public_folder: /images
