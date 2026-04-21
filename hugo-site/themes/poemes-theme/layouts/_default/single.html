@@ -1,9 +1,9 @@
-{{ define "main" }}
+﻿{{ define "main" }}
 <article class="poem-single">
     <header>
         <h1>{{ .Title }}</h1>
         <div class="meta">
-            <time>{{ .Date.Format "2 January 2006" }}</time>
+            <time>{{ .Date | time.Format ":date_long" }}</time>
             {{ range .Params.tags }}
             <a href="/tags/{{ . | urlize }}" class="tag">{{ . }}</a>
             {{ end }}
@@ -11,8 +11,9 @@
     </header>
     <div class="poem-body">{{ .Content }}</div>
     <nav class="poem-nav">
-        {{ with .PrevInSection }}<a href="{{ .RelPermalink }}" class="prev">← {{ .Title }}</a>{{ end }}
-        {{ with .NextInSection }}<a href="{{ .RelPermalink }}" class="next">{{ .Title }} →</a>{{ end }}
+        {{ with .PrevInSection }}<a href="{{ .RelPermalink }}" class="prev">â† {{ .Title }}</a>{{ end }}
+        {{ with .NextInSection }}<a href="{{ .RelPermalink }}" class="next">{{ .Title }} â†’</a>{{ end }}
     </nav>
 </article>
 {{ end }}
+

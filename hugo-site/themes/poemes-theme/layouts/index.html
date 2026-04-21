@@ -1,21 +1,22 @@
-{{ define "main" }}
+﻿{{ define "main" }}
 <div class="hero">
     <h1>{{ .Site.Params.subtitle }}</h1>
     <p class="hero-desc">{{ .Site.Params.description }}</p>
 </div>
 <section class="recent-poems">
-    <h2>Derniers poèmes</h2>
+    <h2>Derniers poÃ¨mes</h2>
     <div class="poem-grid">
         {{ range first 9 (where .Site.RegularPages "Section" "poemes") }}
         <article class="poem-card">
             <a href="{{ .RelPermalink }}">
                 <h3>{{ .Title }}</h3>
-                <time>{{ .Date.Format "2 January 2006" }}</time>
+                <time>{{ .Date | time.Format ":date_long" }}</time>
                 <p class="excerpt">{{ .Summary | truncate 100 }}</p>
             </a>
         </article>
         {{ end }}
     </div>
-    <a href="/poemes/" class="btn-all">Voir tous les poèmes →</a>
+    <a href="/poemes/" class="btn-all">Voir tous les poÃ¨mes â†’</a>
 </section>
 {{ end }}
+
