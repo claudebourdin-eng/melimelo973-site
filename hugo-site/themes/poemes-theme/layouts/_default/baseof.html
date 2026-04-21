@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} - {{ .Site.Title }}{{ end }}</title>
-    <link rel="stylesheet" href="{{ "css/style.css" | absURL }}">
+    <link rel="stylesheet" href="{{ .Site.BaseURL }}css/style.css">
 </head>
 <body>
     <header>
         <nav>
-            <a href="{{ "/" | absURL }}" class="site-title">{{ .Site.Title }}</a>
+            <a href="{{ .Site.BaseURL }}" class="site-title">{{ .Site.Title }}</a>
             <div class="nav-links">
-                <a href="{{ "/" | absURL }}">Accueil</a>
-                <a href="{{ "/poemes/" | absURL }}">Tous les poemes</a>
-                <a href="{{ "/tags/" | absURL }}">Par theme</a>
+                <a href="{{ .Site.BaseURL }}">Accueil</a>
+                <a href="{{ .Site.BaseURL }}poemes/">Tous les poemes</a>
+                <a href="{{ .Site.BaseURL }}tags/">Par theme</a>
             </div>
         </nav>
     </header>
