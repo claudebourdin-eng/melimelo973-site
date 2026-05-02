@@ -50,7 +50,8 @@ def get_all_posts(blog_id):
 
 def clean_title(title):
     title = unescape(title)
-    title = title.replace("'", "'").replace('"', '"').replace('"', '"')
+    title = title.replace("\u2018", "'").replace("\u2019", "'")
+    title = title.replace("\u201c", '"').replace("\u201d", '"')
     title = title.strip("'\" ")
     return title
 
@@ -108,11 +109,8 @@ def save_post(slug, date_pfx, content):
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     name = f"{date_pfx}-{slug}.md"
     path = os.path.join(OUTPUT_DIR, name)
-    n = 1
-    while os.path.exists(path):
-        name = f"{date_pfx}-{slug}-{n}.md"
-        path = os.path.join(OUTPUT_DIR, name)
-        n += 1
+    if os.path.exists(path):
+        return None
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
     return name
@@ -137,20 +135,25 @@ def main():
     if not new_posts:
         print("\nOK Rien de nouveau. Le site est deja a jour !")
         return
-    saved, errors = 0, 0
+    saved, skipped, errors = 0, 0, 0
     for post in new_posts:
         try:
             slug, date_pfx, content = post_to_markdown(post)
             name = save_post(slug, date_pfx, content)
-            imported_ids.add(post["id"])
-            print(f"  OK {name}")
-            saved += 1
+            if name is None:
+                skipped += 1
+            else:
+                imported_ids.add(post["id"])
+                print(f"  OK {name}")
+                saved += 1
         except Exception as e:
             print(f"  ERREUR '{post.get('title','?')}' : {e}")
             errors += 1
     save_imported_ids(imported_ids)
     print(f"\n{'=' * 55}")
     print(f"  OK {saved} nouveaux poemes importes")
+    if skipped:
+        print(f"  Ignores (deja existants) : {skipped}")
     if errors:
         print(f"  ERREURS : {errors}")
     print(f"{'=' * 55}")
